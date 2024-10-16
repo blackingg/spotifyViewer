@@ -1,0 +1,22 @@
+{
+  "name": "spotifyViewer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "client": "npm run dev --prefix client",
+    "server": "node server/server.js",
+    "dev": "concurrently -e \".env\" \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix client && npm run build --prefix server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "node-fetch": "^3.3.2"
+  }
+}
