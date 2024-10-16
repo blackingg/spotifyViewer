@@ -8,84 +8,80 @@ export function TV({ setLyrics, ...props }) {
   const [albumCoverTexture, setAlbumCoverTexture] = useState(null);
   const [currentTrackId, setCurrentTrackId] = useState(null);
 
-  const fetchCurrentlyPlaying = useCallback(async () => {
-    const token_auth = localStorage.getItem("token_auth");
-    if (!token_auth) return;
-
-    try {
-      const response = await fetch(
-        "https://api.spotify.com/v1/me/player/currently-playing",
-        {
-          headers: {
-            Authorization: `Bearer ${token_auth}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data?.item && data.item.id !== currentTrackId) {
-        setCurrentTrackId(data.item.id);
-
-        // Fetch album cover
-        const albumCoverUrl = data.item.album.images[0].url;
-        const image = new Image();
-        image.crossOrigin = "anonymous";
-        image.src = albumCoverUrl;
-
-        image.onload = () => {
-          console.log("Image loaded:", image.src);
-          const canvas = document.createElement("canvas");
-          canvas.width = 400;
-          canvas.height = 400;
-          const context = canvas.getContext("2d");
-
-          const aspectRatio = image.width / image.height;
-          const newWidth = aspectRatio > 1 ? 400 : 400 * aspectRatio;
-          const newHeight = aspectRatio > 1 ? 400 / aspectRatio : 400;
-          const xOffset = (400 - newWidth) / 2;
-          const yOffset = (400 - newHeight) / 2;
-
-          context.drawImage(image, xOffset, yOffset, newWidth, newHeight);
-          setAlbumCoverTexture(new THREE.CanvasTexture(canvas));
-        };
-
-        // Fetch lyrics
-        const trackTitle = data.item.name;
-        const trackArtist = data.item.artists[0].name;
-
-        try {
-          const lyricsResponse = await axios.get("/api/lyrics", {
-            params: { trackTitle, trackArtist },
-          });
-
-          const lyricsData = lyricsResponse.data;
-
-          if (lyricsData.lyrics) {
-            setLyrics(lyricsData.lyrics);
-          } else {
-            setLyrics("Lyrics not found.");
-          }
-        } catch (error) {
-          console.error("Error fetching lyrics:", error);
-          setLyrics("Lyrics unavailable.");
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching currently playing track:", error);
-    }
-  }, [currentTrackId, setLyrics]);
-
   useEffect(() => {
+    let interval;
+
+    const fetchCurrentlyPlaying = async () => {
+      const token_auth = window.localStorage.getItem("token_auth");
+      if (!token_auth) return;
+
+      try {
+        const response = await fetch(
+          "https://api.spotify.com/v1/me/player/currently-playing",
+          {
+            headers: {
+              Authorization: `Bearer ${token_auth}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (data?.item && data.item.id !== currentTrackId) {
+          setCurrentTrackId(data.item.id);
+
+          // Fetch album cover
+          const albumCoverUrl = data.item.album.images[0].url;
+          const image = new Image();
+          image.crossOrigin = "anonymous";
+          image.src = albumCoverUrl;
+
+          image.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 400;
+            canvas.height = 400;
+            const context = canvas.getContext("2d");
+
+            const aspectRatio = image.width / image.height;
+            const newWidth = aspectRatio > 1 ? 400 : 400 * aspectRatio;
+            const newHeight = aspectRatio > 1 ? 400 / aspectRatio : 400;
+            const xOffset = (400 - newWidth) / 2;
+            const yOffset = (400 - newHeight) / 2;
+
+            context.drawImage(image, xOffset, yOffset, newWidth, newHeight);
+            setAlbumCoverTexture(new THREE.CanvasTexture(canvas));
+          };
+
+          // Fetch lyrics
+          const trackTitle = data.item.name;
+          const trackArtist = data.item.artists[0].name;
+
+          try {
+            const lyricsResponse = await axios.get("/api/lyrics", {
+              params: { trackTitle, trackArtist },
+            });
+
+            const lyricsData = lyricsResponse.data;
+
+            if (lyricsData.lyrics) {
+              setLyrics(lyricsData.lyrics);
+            } else {
+              setLyrics("Lyrics not found.");
+            }
+          } catch (error) {
+            console.error("Error fetching lyrics:", error);
+            setLyrics("Lyrics unavailable.");
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching currently playing track:", error);
+      }
+    };
     fetchCurrentlyPlaying();
-    const interval = setInterval(fetchCurrentlyPlaying, 200);
+    interval = setInterval(fetchCurrentlyPlaying, 5000);
 
     return () => clearInterval(interval);
-  }, [fetchCurrentlyPlaying]);
+  }, [currentTrackId, setLyrics]);
 
   return (
     <group
