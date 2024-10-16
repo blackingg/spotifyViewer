@@ -82,7 +82,7 @@ export function TV({ setLyrics, ...props }) {
 
   useEffect(() => {
     fetchCurrentlyPlaying();
-    const interval = setInterval(fetchCurrentlyPlaying, 5000);
+    const interval = setInterval(fetchCurrentlyPlaying, 200);
 
     return () => clearInterval(interval);
   }, [fetchCurrentlyPlaying]);
