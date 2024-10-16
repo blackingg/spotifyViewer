@@ -38,6 +38,7 @@ export function TV({ setLyrics, ...props }) {
         image.src = albumCoverUrl;
 
         image.onload = () => {
+          console.log("Image loaded:", image.src);
           const canvas = document.createElement("canvas");
           canvas.width = 400;
           canvas.height = 400;
