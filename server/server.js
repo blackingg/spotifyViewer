@@ -1,53 +1,31 @@
 import axios from "axios";
 
-export default async (event) => {
-  //console.log("queryStringParameters:", event.queryStringParameters, event);
-  //const { trackTitle, trackArtist } = event.queryStringParameters;
-
-  console.log("Event:", JSON.stringify(event, null, 2));
-
-  // Assuming event.rawUrl contains the full URL
-  const url = new URL(event.rawUrl);
-
-  // Extract query parameters from the URL
-  const searchParams = new URLSearchParams(url.search);
-
-  console.log("searchParams:", searchParams);
-
-  // Access individual parameters
-  const trackTitle = searchParams.get("trackTitle") || "defaultValue1";
-  const trackArtist = searchParams.get("trackArtist") || "defaultValue2";
+export default async function handler(req, res) {
+  const { trackTitle, trackArtist } = req.query;
 
   console.log("trackTitle:", trackTitle);
   console.log("trackArtist:", trackArtist);
 
-  const VITE_MUSIXMATCH_API_KEY = import.meta.env.VITE_MUSIXMATCH_API_KEY;
+  const MUSIXMATCH_API_KEY = process.env.VITE_MUSIXMATCH_API_KEY;
 
-  if (!VITE_MUSIXMATCH_API_KEY) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "No Musixmatch API key provided." }),
-    };
+  if (!MUSIXMATCH_API_KEY) {
+    return res.status(500).json({ error: "No Musixmatch API key provided." });
   }
 
   try {
     // Step 1: Search for the track to get the song ID
-    console.log("this is before the first axios");
     const searchResponse = await axios.get(
-      `https://api.musixmatch.com/ws/1.1/track.search?q_track=${trackTitle}&q_artist=${trackArtist}&apikey=${VITE_MUSIXMATCH_API_KEY}`
+      `https://api.musixmatch.com/ws/1.1/track.search?q_track=${encodeURIComponent(
+        trackTitle
+      )}&q_artist=${encodeURIComponent(
+        trackArtist
+      )}&apikey=${MUSIXMATCH_API_KEY}`
     );
-
-    console.log("searchResponse:", searchResponse.data);
 
     const trackList = searchResponse.data.message.body.track_list;
 
-    console.log("trackList:", trackList);
-
     if (!trackList || trackList.length === 0) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ message: "No matching track found." }),
-      };
+      return res.status(404).json({ message: "No matching track found." });
     }
 
     // Extracting the track ID from the first result
@@ -55,29 +33,20 @@ export default async (event) => {
 
     // Step 2: Use the track ID to get the lyrics
     const lyricsResponse = await axios.get(
-      `https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=${trackId}&apikey=${VITE_MUSIXMATCH_API_KEY}`
+      `https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=${trackId}&apikey=${MUSIXMATCH_API_KEY}`
     );
 
     const lyrics = lyricsResponse.data.message.body.lyrics.lyrics_body;
 
-    return {
-      statusCode: 200,
-      body: lyrics ? JSON.stringify({ lyrics }) : "lyrics not found",
-    };
+    return res.status(200).json({ lyrics: lyrics || "Lyrics not found" });
   } catch (error) {
+    console.error("Error fetching lyrics:", error);
     if (error.response && error.response.status === 403) {
-      return {
-        statusCode: 403,
-        body: JSON.stringify({
-          error: "API rate limit reached or invalid key.",
-        }),
-      };
+      return res
+        .status(403)
+        .json({ error: "API rate limit reached or invalid key." });
     } else {
-      console.error(error);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Error fetching lyrics." }),
-      };
+      return res.status(500).json({ error: "Error fetching lyrics." });
     }
   }
-};
+}
