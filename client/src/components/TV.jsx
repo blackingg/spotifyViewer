@@ -102,8 +102,10 @@ export function TV({ setLyrics, ...props }) {
               material={materials.TV_Body_material}
             />
             <mesh geometry={nodes["0"].geometry}>
-              {albumCoverTexture && (
+              {albumCoverTexture ? (
                 <meshBasicMaterial map={albumCoverTexture} />
+              ) : (
+                <meshBasicMaterial color={"black"} />
               )}
             </mesh>
           </group>
