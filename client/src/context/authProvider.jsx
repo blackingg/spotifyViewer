@@ -1,51 +1,33 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
-  const [logIn, setLogInToken] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  const CLIENT_ID = import.meta.env.VITE_Client_ID;
+  const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
   const REDIRECT_URI = "https://spotify-viewer-delta.vercel.app";
-  const TOKEN_ENDPOINT = "https://accounts.spotify.com/authorize";
+  const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
+  const SCOPE = "user-read-currently-playing";
 
-  const AuthUrl = `${TOKEN_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=${RESPONSE_TYPE}&scope=user-read-currently-playing`;
+  const authUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
+    REDIRECT_URI
+  )}&response_type=${RESPONSE_TYPE}&scope=${encodeURIComponent(SCOPE)}`;
 
-  useEffect(() => {
-    const hash = window.location.hash;
-    let token_auth = window.localStorage.getItem("token_auth");
-
-    if (!token_auth && hash) {
-      token_auth = hash
-        .substring(1)
-        .split("&")
-        .find((elem) => elem.startsWith("access_token"))
-        .split("=")[1];
-
-      window.location.hash = "";
-      window.localStorage.setItem("token_auth", token_auth);
-    }
-
-    if (token_auth) {
-      setToken(token_auth);
-      validateToken(token_auth);
-    }
-  }, []);
-
-  const validateToken = async (token_auth) => {
+  const validateToken = useCallback(async (accessToken) => {
     try {
       const response = await fetch("https://api.spotify.com/v1/me", {
         headers: {
-          Authorization: `Bearer ${token_auth}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
       if (response.ok) {
-        setLogInToken(true);
+        setIsLoggedIn(true);
       } else {
         logout();
       }
@@ -53,19 +35,40 @@ export const AuthProvider = ({ children }) => {
       console.error("Error validating token:", error);
       logout();
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    let storedToken = localStorage.getItem("spotify_token");
+
+    if (!storedToken && hash) {
+      storedToken = hash
+        .substring(1)
+        .split("&")
+        .find((elem) => elem.startsWith("access_token"))
+        ?.split("=")[1];
+
+      if (storedToken) {
+        localStorage.setItem("spotify_token", storedToken);
+        window.location.hash = "";
+      }
+    }
+
+    if (storedToken) {
+      setToken(storedToken);
+      validateToken(storedToken);
+    }
+  }, [validateToken]);
 
   const logout = () => {
     setToken(null);
-    setLogInToken(false);
-    window.localStorage.removeItem("token_auth");
+    setIsLoggedIn(false);
+    localStorage.removeItem("spotify_token");
     navigate("/");
   };
 
   return (
-    <AuthContext.Provider
-      value={{ token, logout, AuthUrl, logIn, setLogInToken }}
-    >
+    <AuthContext.Provider value={{ token, isLoggedIn, logout, authUrl }}>
       {children}
     </AuthContext.Provider>
   );

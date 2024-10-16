@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/authProvider";
 
 function Login() {
-  const { AuthUrl, logIn: isLoggedIn } = useContext(AuthContext);
+  const { authUrl, isLoggedIn } = useContext(AuthContext);
   const [animate, setAnimate] = useState(false);
   const [showContent, setShowContent] = useState(false);
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ function Login() {
         >
           <h1 className="text-white text-4xl mb-6">Login to Spotify</h1>
           <a
-            href={AuthUrl}
+            href={authUrl}
             className="bg-white text-green-500 px-6 py-3 rounded-full text-lg font-bold transition duration-300 ease-in-out hover:bg-green-400"
           >
             Login with Spotify
