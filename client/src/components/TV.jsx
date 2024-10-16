@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import axios from "axios";
