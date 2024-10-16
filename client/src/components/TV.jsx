@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import axios from "axios";
@@ -7,6 +7,7 @@ export function TV({ setLyrics, ...props }) {
   const { nodes, materials } = useGLTF("model/TV.glb");
   const [albumCoverTexture, setAlbumCoverTexture] = useState(null);
   const [currentTrackId, setCurrentTrackId] = useState(null);
+  const textureRef = useRef(null);
 
   useEffect(() => {
     let interval;
@@ -32,26 +33,12 @@ export function TV({ setLyrics, ...props }) {
 
           // Fetch album cover
           const albumCoverUrl = data.item.album.images[0].url;
-          const image = new Image();
-          image.crossOrigin = "anonymous";
-          image.src = albumCoverUrl;
-
-          image.onload = () => {
-            console.log("Image loaded:", image);
-            const canvas = document.createElement("canvas");
-            canvas.width = 400;
-            canvas.height = 400;
-            const context = canvas.getContext("2d");
-
-            const aspectRatio = image.width / image.height;
-            const newWidth = aspectRatio > 1 ? 400 : 400 * aspectRatio;
-            const newHeight = aspectRatio > 1 ? 400 / aspectRatio : 400;
-            const xOffset = (400 - newWidth) / 2;
-            const yOffset = (400 - newHeight) / 2;
-
-            context.drawImage(image, xOffset, yOffset, newWidth, newHeight);
-            setAlbumCoverTexture(new THREE.CanvasTexture(canvas));
-          };
+          const textureLoader = new THREE.TextureLoader();
+          textureLoader.crossOrigin = "anonymous";
+          textureLoader.load(albumCoverUrl, (texture) => {
+            console.log("Texture loaded:", texture);
+            setAlbumCoverTexture(texture);
+          });
 
           // Fetch lyrics
           const trackTitle = data.item.name;
@@ -84,6 +71,13 @@ export function TV({ setLyrics, ...props }) {
     return () => clearInterval(interval);
   }, [currentTrackId, setLyrics]);
 
+  useEffect(() => {
+    if (albumCoverTexture && textureRef.current) {
+      textureRef.current.map = albumCoverTexture;
+      textureRef.current.needsUpdate = true;
+    }
+  }, [albumCoverTexture]);
+
   return (
     <group
       {...props}
@@ -100,9 +94,7 @@ export function TV({ setLyrics, ...props }) {
               material={materials.TV_Body_material}
             />
             <mesh geometry={nodes["0"].geometry}>
-              {albumCoverTexture && (
-                <meshBasicMaterial map={albumCoverTexture} />
-              )}
+              <meshBasicMaterial ref={textureRef} />
             </mesh>
           </group>
         </group>
