@@ -5,7 +5,7 @@ import { easing } from "maath";
 import { TV } from "../components/TV";
 import { LyricsDisplay } from "../components/Lyrics";
 
-const MUSIXMATCH_API_KEY = import.meta.env.MUSIXMATCH_API_KEY;
+const VITE_MUSIXMATCH_API_KEY = import.meta.env.VITE_MUSIXMATCH_API_KEY;
 
 const State = proxy({
   pointer: { x: 0, y: 0 },
@@ -39,7 +39,7 @@ const AnimatedGroup = ({ lyrics, setLyrics }) => {
 
 function Experience() {
   useEffect(() => {
-    console.log("MUSIXMATCH_API_KEY:", MUSIXMATCH_API_KEY);
+    console.log("VITE_MUSIXMATCH_API_KEY:", VITE_MUSIXMATCH_API_KEY);
   });
   const [lyrics, setLyrics] = useState(""); // Define lyrics state
 

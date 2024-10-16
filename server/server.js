@@ -21,9 +21,9 @@ export default async (event) => {
   console.log("trackTitle:", trackTitle);
   console.log("trackArtist:", trackArtist);
 
-  const MUSIXMATCH_API_KEY = import.meta.env.MUSIXMATCH_API_KEY;
+  const VITE_MUSIXMATCH_API_KEY = import.meta.env.VITE_MUSIXMATCH_API_KEY;
 
-  if (!MUSIXMATCH_API_KEY) {
+  if (!VITE_MUSIXMATCH_API_KEY) {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "No Musixmatch API key provided." }),
@@ -34,7 +34,7 @@ export default async (event) => {
     // Step 1: Search for the track to get the song ID
     console.log("this is before the first axios");
     const searchResponse = await axios.get(
-      `https://api.musixmatch.com/ws/1.1/track.search?q_track=${trackTitle}&q_artist=${trackArtist}&apikey=${MUSIXMATCH_API_KEY}`
+      `https://api.musixmatch.com/ws/1.1/track.search?q_track=${trackTitle}&q_artist=${trackArtist}&apikey=${VITE_MUSIXMATCH_API_KEY}`
     );
 
     console.log("searchResponse:", searchResponse.data);
@@ -55,7 +55,7 @@ export default async (event) => {
 
     // Step 2: Use the track ID to get the lyrics
     const lyricsResponse = await axios.get(
-      `https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=${trackId}&apikey=${MUSIXMATCH_API_KEY}`
+      `https://api.musixmatch.com/ws/1.1/track.lyrics.get?track_id=${trackId}&apikey=${VITE_MUSIXMATCH_API_KEY}`
     );
 
     const lyrics = lyricsResponse.data.message.body.lyrics.lyrics_body;
