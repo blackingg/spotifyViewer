@@ -37,6 +37,7 @@ export function TV({ setLyrics, ...props }) {
           image.src = albumCoverUrl;
 
           image.onload = () => {
+            console.log("Image loaded:", image);
             const canvas = document.createElement("canvas");
             canvas.width = 400;
             canvas.height = 400;
@@ -99,10 +100,8 @@ export function TV({ setLyrics, ...props }) {
               material={materials.TV_Body_material}
             />
             <mesh geometry={nodes["0"].geometry}>
-              {albumCoverTexture ? (
+              {albumCoverTexture && (
                 <meshBasicMaterial map={albumCoverTexture} />
-              ) : (
-                <meshBasicMaterial color={"black"} />
               )}
             </mesh>
           </group>
