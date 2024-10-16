@@ -38,9 +38,6 @@ const AnimatedGroup = ({ lyrics, setLyrics }) => {
 };
 
 function Experience() {
-  useEffect(() => {
-    console.log("MUSIXMATCH_API_KEY:", MUSIXMATCH_API_KEY);
-  });
   const [lyrics, setLyrics] = useState(""); // Define lyrics state
 
   const handleMouseMove = (event) => {
