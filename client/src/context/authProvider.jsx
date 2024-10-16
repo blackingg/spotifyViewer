@@ -9,13 +9,13 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   const CLIENT_ID = import.meta.env.VITE_CLIENT_ID;
-  const REDIRECT_URI = "https://spotify-viewer-blackingg.vercel.app";
+  const REDIRECT_URL = import.meta.env.VITE_REDIRECT_URL;
   const AUTH_ENDPOINT = "https://accounts.spotify.com/authorize";
   const RESPONSE_TYPE = "token";
   const SCOPE = "user-read-currently-playing";
 
   const authUrl = `${AUTH_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(
-    REDIRECT_URI
+    REDIRECT_URL
   )}&response_type=${RESPONSE_TYPE}&scope=${encodeURIComponent(SCOPE)}`;
 
   const validateToken = useCallback(async (accessToken) => {
