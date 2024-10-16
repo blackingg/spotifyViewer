@@ -88,31 +88,31 @@ export function TV({ setLyrics, ...props }) {
     return () => clearInterval(interval);
   }, [currentTrackId, setLyrics]);
 
-  return (
-    <group
-      {...props}
-      dispose={null}
-    >
-      <mesh
-        geometry={nodes.TV_Body.geometry}
-        material={materials.Body}
-      />
-      <mesh
-        geometry={nodes.TV_Frame.geometry}
-        material={materials.Frame}
-      />
-      <mesh geometry={nodes.TV_Screen.geometry}>
-        <meshBasicMaterial>
-          {albumCoverTexture && (
-            <primitive
-              attach="map"
-              object={albumCoverTexture}
-            />
-          )}
-        </meshBasicMaterial>
-      </mesh>
-    </group>
-  );
+   return (
+     <group
+       {...props}
+       dispose={null}
+     >
+       <group
+         position={[0, 0, -1000]}
+         rotation={[Math.PI / 2, 0, 13]}
+       >
+         <group rotation={[-Math.PI, 0, 0]}>
+           <group scale={100}>
+             <mesh
+               geometry={nodes["1"].geometry}
+               material={materials.TV_Body_material}
+             />
+             <mesh geometry={nodes["0"].geometry}>
+               {albumCoverTexture && (
+                 <meshBasicMaterial map={albumCoverTexture} />
+               )}
+             </mesh>
+           </group>
+         </group>
+       </group>
+     </group>
+   );
 }
 
 useGLTF.preload("model/TV.glb");
