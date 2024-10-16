@@ -21,7 +21,7 @@ export default async (event) => {
   console.log("trackTitle:", trackTitle);
   console.log("trackArtist:", trackArtist);
 
-  const MUSIXMATCH_API_KEY = import.meta.env.VITE_MUSIXMATCH_API_KEY;
+  const MUSIXMATCH_API_KEY = import.meta.env.MUSIXMATCH_API_KEY;
 
   if (!MUSIXMATCH_API_KEY) {
     return {
