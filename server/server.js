@@ -3,16 +3,8 @@ import axios from "axios";
 import cors from "cors";
 
 const app = express();
-
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"],
-    credentials: true,
-  })
-);
-
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(cors());
 
 app.post("/api/lyrics", async (req, res) => {
   try {
