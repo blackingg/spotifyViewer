@@ -26,6 +26,7 @@ export function TV({ setLyrics, ...props }) {
         );
 
         const data = await response.json();
+        console.log("Currently playing track:", data);
 
         if (data?.item && data.item.id !== currentTrackId) {
           setCurrentTrackId(data.item.id);
