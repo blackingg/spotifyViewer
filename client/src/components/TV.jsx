@@ -9,9 +9,11 @@ export function TV({ setLyrics, ...props }) {
   const [currentTrackId, setCurrentTrackId] = useState(null);
 
   useEffect(() => {
+    console.log("Fetching currently playing track 1...");
     let interval;
 
     const fetchCurrentlyPlaying = async () => {
+      console.log("Fetching currently playing track 2...");
       const token_auth = window.localStorage.getItem("token_auth");
       if (!token_auth) return;
 
