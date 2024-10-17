@@ -58,8 +58,9 @@ export function TV({ setLyrics, ...props }) {
           const trackArtist = data.item.artists[0].name;
 
           try {
-            const lyricsResponse = await axios.get("/api/lyrics", {
-              params: { trackTitle, trackArtist },
+            const lyricsResponse = await axios.post("/api/lyrics", {
+              trackTitle,
+              trackArtist,
             });
 
             const lyricsData = lyricsResponse.data;
