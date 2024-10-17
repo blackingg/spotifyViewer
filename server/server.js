@@ -1,7 +1,14 @@
+import express from "express";
 import axios from "axios";
+import dotenv from "dotenv";
 
-export default async function handler(req, res) {
-  const { trackTitle, trackArtist } = req.query;
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+
+app.post("/api/lyrics", async (req, res) => {
+  const { trackTitle, trackArtist } = req.body; // Extract track title and artist from the request body
 
   console.log("trackTitle:", trackTitle);
   console.log("trackArtist:", trackArtist);
@@ -49,4 +56,9 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Error fetching lyrics." });
     }
   }
-}
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
