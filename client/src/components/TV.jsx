@@ -14,10 +14,11 @@ export function TV({ setLyrics, ...props }) {
 
     const fetchCurrentlyPlaying = async () => {
       console.log("Fetching currently playing track 2...");
-      const token_auth = window.localStorage.getItem("token_auth");
+      const token_auth = window.localStorage.getItem("spotify_token");
       if (!token_auth) return;
 
       try {
+        console.log("Fetching currently playing track 3...");
         const response = await fetch(
           "https://api.spotify.com/v1/me/player/currently-playing",
           {
