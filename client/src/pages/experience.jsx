@@ -5,8 +5,6 @@ import { easing } from "maath";
 import { TV } from "../components/TV";
 import { LyricsDisplay } from "../components/Lyrics";
 
-const MUSIXMATCH_API_KEY = import.meta.env.VITE_MUSIXMATCH_API_KEY;
-
 const State = proxy({
   pointer: { x: 0, y: 0 },
 });

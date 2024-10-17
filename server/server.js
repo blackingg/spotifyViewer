@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   console.log("trackTitle:", trackTitle);
   console.log("trackArtist:", trackArtist);
 
-  const MUSIXMATCH_API_KEY = process.env.VITE_MUSIXMATCH_API_KEY;
+  const MUSIXMATCH_API_KEY = process.env.MUSIXMATCH_API_KEY;
 
   if (!MUSIXMATCH_API_KEY) {
     return res.status(500).json({ error: "No Musixmatch API key provided." });
