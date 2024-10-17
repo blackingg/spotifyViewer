@@ -9,16 +9,13 @@ export function TV({ setLyrics, ...props }) {
   const [currentTrackId, setCurrentTrackId] = useState(null);
 
   useEffect(() => {
-    console.log("Fetching currently playing track 1...");
     let interval;
 
     const fetchCurrentlyPlaying = async () => {
-      console.log("Fetching currently playing track 2...");
       const token_auth = window.localStorage.getItem("spotify_token");
       if (!token_auth) return;
 
       try {
-        console.log("Fetching currently playing track 3...");
         const response = await fetch(
           "https://api.spotify.com/v1/me/player/currently-playing",
           {
@@ -29,7 +26,6 @@ export function TV({ setLyrics, ...props }) {
         );
 
         const data = await response.json();
-        console.log("Currently playing track:", data);
 
         if (data?.item && data.item.id !== currentTrackId) {
           setCurrentTrackId(data.item.id);
